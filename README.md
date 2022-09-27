@@ -2,12 +2,18 @@
 
 > Semester 7, 4th study year
 
+![Python CI workflow](https://github.com/SMore-Napi/DevOps_Innopolis/actions/workflows/python_ci.yml/badge.svg)
+![Kotlin CI workflow](https://github.com/SMore-Napi/DevOps_Innopolis/actions/workflows/kotlin_ci.yml/badge.svg)
+
 ## Contents
 
 - [Overview](#overview)
 - [Build](#build)
 - [Docker](#docker)
 - [Usage](#usage)
+- [Unit tests](#unit-tests)
+- [Linters](#linters)
+- [CI](#ci)
 - [Contact](#contact)
 
 ## Overview
@@ -28,7 +34,7 @@ The application was developed in two programming languages:
 - Open your terminal
 - `git clone https://github.com/SMore-Napi/DevOps_Innopolis.git`
 - `cd DevOps_Innopolis`
-- `git checkout lab1`
+- `git checkout lab3`
 
 ### Python build
 
@@ -42,7 +48,7 @@ The application was developed in two programming languages:
 #### Running
 
 - Open your terminal
-- Go to the **app_python** folder: `cd app_python`
+- Go to the **app_python** folder: `cd app_python/app`
 - Run application: `uvicorn main:app --reload`
 
 ### Kotlin build
@@ -90,11 +96,11 @@ The application was developed in two programming languages:
    - `--rm` automatically remove the container when it exits.
   You can omit this parameter.
    - `-p` expose port 8000.
-   - `--name app_python` - container name. You can specify any name you'd like.
+   - `--name` - container name. You can specify any name you'd like.
    - `<app_python_image>` - image name.
       - Use `app_python_image` if you built your own image.
       - Use `smorenapi/app_python:latest` if you pulled the image from my repository
-      - You can also include `-d` to run a container in the background
+   - You can also include `-d` to run a container in the background
        (detached mode).
 
 ### Kotlin image
@@ -122,12 +128,12 @@ The application was developed in two programming languages:
    - `--rm` automatically remove the container when it exits.
   You can omit this parameter.
    - `-p` expose port 8080.
-   - `--name app_kotlin` - container name. You can specify any name you'd like.
+   - `--name` - container name. You can specify any name you'd like.
    - `<app_kotlin_image>` - image name.
       - Use `app_kotlin_image` if you built your own image.
       - Use `smorenapi/app_kotlin:latest` if you pulled the image from my repository
-      - You can also include `-d` to run a container in the
-       background (detached mode).
+   - You can also include `-d` to run a container in the
+        background (detached mode).
 
 ## Usage
 
@@ -144,6 +150,58 @@ The application was developed in two programming languages:
 - Each time when you refresh a page you will see the actual Moscow time
 
 ![Web App](https://user-images.githubusercontent.com/49106163/188326480-63eefcee-88fc-4692-a234-85f34d5afd65.png)
+
+## Unit tests
+
+- Right now there are unit tests that check the Moscow Time retrieving:
+  time interval (that time is really updated each second)
+  and HTML web page content.
+
+### Run Python tests
+
+- `cd app_python`
+- `python -m unittest discover tests`
+- Tests are in [test_msk_time_unit.py](app_python/tests/test_msk_time_unit.py)
+  and
+  [test_msk_time_integration.py](app_python/tests/test_msk_time_integration.py)
+  files.
+
+### Run Kotlin tests
+
+- `cd app_kotlin`
+- `./gradlew detekt`
+
+## Linters
+
+- to check markdown files I used
+  [Markdown lint](https://github.com/markdownlint/markdownlint) tool
+   - Install: `rake install`
+   - Check: `mdl ../DevOps_Innopolis` (will argue on **Labs** files)
+
+## CI
+
+- I used GitHub Actions for the Continuous integration
+
+### Python CI
+
+- Workflow is described in [python_ci.yml](.github/workflows/python_ci.yml)
+- It runs python build:
+   - Download dependencies.
+   - Run linter.
+   - Run tests.
+- Then checks for vulnerabilities.
+- Finally, uploads Docker image to docker hub.
+
+### Kotlin CI
+
+- Workflow is described in [kotlin_ci.yml](.github/workflows/kotlin_ci.yml)
+- Firstly, we set up JDK 17.
+- Then run gradle build which includes tasks:
+   - Download dependencies.
+   - Run detekt linter.
+   - Run unit tests.
+- Then checks for vulnerabilities.
+- Finally, uploads Docker image to docker hub.
 
 ## Contact
 

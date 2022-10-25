@@ -2,12 +2,15 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi import Response
+from starlette_prometheus import metrics, PrometheusMiddleware
 # pylint: disable=import-error
 from view import html_response
 # pylint: disable=import-error
 from service import msk_time
 
 app = FastAPI()
+app.add_middleware(PrometheusMiddleware)
+app.add_route("/metrics", metrics)
 
 
 @app.get("/", response_class=HTMLResponse)

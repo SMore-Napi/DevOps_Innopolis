@@ -1,66 +1,225 @@
-# Labs
+# DevOps course at Innopolis University
 
-## Introduction
+> Semester 7, 4th study year
 
-Welcome to DevOps course labs. All labs are practical and will be built on each other. You will implement simple application, containerize it, implement simple tests, prepare an infrastructure and CI/CD processes, collect metrics, logs, etc.
+![Python CI workflow](https://github.com/SMore-Napi/DevOps_Innopolis/actions/workflows/python_ci.yml/badge.svg)
+![Kotlin CI workflow](https://github.com/SMore-Napi/DevOps_Innopolis/actions/workflows/kotlin_ci.yml/badge.svg)
 
-## Architecture
+## Contents
 
-This repository contains a master branch with introduction and one branch with instructions for each lab.
+- [Overview](#overview)
+- [Build](#build)
+- [Docker](#docker)
+- [Usage](#usage)
+- [Unit tests](#unit-tests)
+- [Linters](#linters)
+- [CI](#ci)
+- [Contact](#contact)
 
-## Rules
+## Overview
 
-Each labs requires the participant to finish all previous labs, therefore **participants are required to submit each lab and get at least 6/10 points for each lab to pass the course**.
+This is a simple web application that shows the Moscow time
+each time when you refresh a page.
+The application was developed in two programming languages:
 
-Grading is based on PRs with your solution to the corresponding branch of this repository. This repository is read-only for all participants, therefore to be able to create a pull request, a participant should fork this repository to his own workspace and solve the lab there. It is recommended to build a solution of a lab N upon a solution of lab N-1, so choose workflow in your fork of this repository wisely. Structure of your repository will not affect your grade, only state of your repository from which the PR is created will be checked and graded (state after last commit in your PR on corresponding lab).
+- Python with the use of [FastAPI](https://fastapi.tiangolo.com) framework.
+  Can be found in [app_python](/app_python/) folder.
+- Kotlin with the use of [Spring](https://spring.io) framework.
+  Can be found in [app_kotlin](/app_kotlin/) folder.
 
-### Recommended workflow
+## Build
 
-#### For the first lab
+### Download
 
-1. Fork this repository.
-2. Checkout to lab1 branch.
-3. Complete lab1 tasks.
-4. Push the code to your repository.
-5. Create a PR to the lab1 branch on this repository from your fork's lab1 branch.
-6. Create an archive with the current version of your code and submit a zip file to Moodle.
-7. Create a team with with your classmates, 6 people max.
-8. Each student must review PRs of all teammates.
-9. Wait for your grade.
+- Open your terminal
+- `git clone https://github.com/SMore-Napi/DevOps_Innopolis.git`
+- `cd DevOps_Innopolis`
+- `git checkout lab8`
 
-## Grading
+### Python build
 
-### Points distribution for the course
+#### Installation
 
-```
-70 - labs
-20 - final exam
-10 - attendance on lectures
-```
+- All required dependencies are stored in the `requirements.txt` file.
+- Open your terminal.
+- Go to the **app_python** folder: `cd app_python`
+- `pip install -r requirements.txt`
 
-### Grade ranges
+#### Running
 
-```
-[90;100] - A
-[75;90)  - B
-[60;75)  - C
-[0;60)   - D
-```
+- Open your terminal
+- Go to the **app_python** folder: `cd app_python/app`
+- Run application: `uvicorn main:app --reload`
 
-### Labs grading
+### Kotlin build
 
-Each lab is marked out of 10. All labs have a set of main tasks and a set of extra tasks.
+- Install [JDK](https://www.oracle.com/java/technologies/downloads/)
+- Install [Gradle](https://gradle.org/install/)
+- Open your terminal
+- Go to the **app_kotlin** folder: `cd app_kotlin`
+- Run application: `./gradlew bootRun`
 
-Completing main tasks correctly will give you 10 points out of 10. Completing extra tasks correctly will give you some additional points, depends on the bonus task difficulty. Your points for main and extra tasks will be summed up and will help you to get a better grade.
+## Docker
 
-If you finish all bonus tasks correctly the **permission to skip the exam will be granted to you + 10 extra points**. If you finish not all of them you will must pass the exam, but it can save you from the exam's failure.
+- You can skip the [Build](#build) part and avoid installing packages.
+  Instead, run the docker image. Preliminarily, you should build or pull this image.
 
-## Deadlines and labs distribution
+### Python image
 
-Participants have 2 new labs every week simultaneously and 1 week to submit solutions. Moodle will contain presentations and deadlines.
+#### Build Python image
 
-You are required to submit a zip file with your source code to corresponding assignment in moodle. This is required for the university as a proof of work.
+- Open your terminal. Your directory should be the root: `pwd`: **/DevOps_Innopolis**
+- Build image: `docker build -t app_python_image app_python`
+   - `app_python_image` - image name. You can change it whatever you want.
+   - `app_python` - the folder in which the `Dockerfile` is placed.
+  > In case you are already in the **/app_python** folder, you can use
+  this command `docker build -t app_python_image .`
 
-## Submission policy
+#### Pull Python image
 
-**Submitting results after the deadline will result in maximum of 6 points for the corresponding lab. As stated before, all labs must be submitted to pass the course.**
+- In case you don't want to build an image, you can pull the already
+  pushed image in the docker
+  hub: [app_python](https://hub.docker.com/repository/docker/smorenapi/app_python)
+- Run `docker pull smorenapi/app_python:latest`
+
+##### Small instruction on how to push an image
+
+- Assign image name: `docker image tag app_python_image:latest <login>/app_python:latest`
+- Push: `docker image push <login>/app_python:latest`
+
+> Use your docker hub login instead of `<login>`
+
+#### Run Python image
+
+- You need a built or pulled image.
+- Run image: `docker run --rm -p 8000:8000 --name app_python <app_python_image>`
+   - `--rm` automatically remove the container when it exits.
+  You can omit this parameter.
+   - `-p` expose port 8000.
+   - `--name` - container name. You can specify any name you'd like.
+   - `<app_python_image>` - image name.
+      - Use `app_python_image` if you built your own image.
+      - Use `smorenapi/app_python:latest` if you pulled the image from my repository
+   - You can also include `-d` to run a container in the background
+       (detached mode).
+
+### Kotlin image
+
+#### Build Kotlin image
+
+- Open your terminal. Your directory should be the root: `pwd`: **/DevOps_Innopolis**
+- Build image: `docker build -t app_kotlin_image app_kotlin`
+   - `app_kotlin_image` - image name. You can change it whatever you want.
+   - `app_kotlin` - the folder in which the `Dockerfile` is placed.
+     > In case you are already in the **/app_kotlin** folder, you can use this
+  command `docker build -t app_kotlin_image .`
+
+#### Pull Kotlin image
+
+- In case you don't want to build an image, you can pull the already
+  pushed image in the docker
+  hub: [app_kotlin](https://hub.docker.com/repository/docker/smorenapi/app_kotlin)
+- Run `docker pull smorenapi/app_kotlin:latest`
+
+#### Run Kotlin image
+
+- You need a built or pulled image.
+- Run image: `docker run --rm -p 8080:8080 --name app_kotlin <app_kotlin_image>`
+   - `--rm` automatically remove the container when it exits.
+  You can omit this parameter.
+   - `-p` expose port 8080.
+   - `--name` - container name. You can specify any name you'd like.
+   - `<app_kotlin_image>` - image name.
+      - Use `app_kotlin_image` if you built your own image.
+      - Use `smorenapi/app_kotlin:latest` if you pulled the image from my repository
+   - You can also include `-d` to run a container in the
+        background (detached mode).
+
+## Usage
+
+### Python usage
+
+- Run the application and open this URL in your browser: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- Each time when you refresh a page you will see the actual Moscow time
+
+![Web App](https://user-images.githubusercontent.com/49106163/188318587-e71e43a8-8bdf-46f3-a29f-f2377f4b5e86.png)
+
+- Also, you can use
+  [http://127.0.0.1:8000/healthcheck](http://127.0.0.1:8000/healthcheck)
+  endpoint as a metric:
+
+![Web App Healthcheck](https://user-images.githubusercontent.com/49106163/194942463-a822beb7-a420-4f75-a5bc-892353b81f48.png)
+
+
+### Kotlin usage
+
+- Run the application and open this URL in your browser: [http://127.0.0.1:8080](http://127.0.0.1:8080)
+- Each time when you refresh a page you will see the actual Moscow time
+
+![Web App](https://user-images.githubusercontent.com/49106163/188326480-63eefcee-88fc-4692-a234-85f34d5afd65.png)
+
+- Also, you can use
+  [http://127.0.0.1:8080/healthcheck](http://127.0.0.1:8080/healthcheck)
+  endpoint as a metric:
+
+![Web App Healthcheck](https://user-images.githubusercontent.com/49106163/194942565-61d4fdd2-8547-445a-94bd-34d9f83d83ec.png)
+
+## Unit tests
+
+- Right now there are unit tests that check the Moscow Time retrieving:
+  time interval (that time is really updated each second)
+  and HTML web page content.
+
+### Run Python tests
+
+- `cd app_python`
+- `python -m unittest discover tests`
+- Tests are in [test_msk_time_unit.py](app_python/tests/test_msk_time_unit.py)
+  and
+  [test_msk_time_integration.py](app_python/tests/test_msk_time_integration.py)
+  files.
+
+### Run Kotlin tests
+
+- `cd app_kotlin`
+- `./gradlew detekt`
+
+## Linters
+
+- to check markdown files I used
+  [Markdown lint](https://github.com/markdownlint/markdownlint) tool
+   - Install: `rake install`
+   - Check: `mdl ../DevOps_Innopolis` (will argue on **Labs** files)
+
+## CI
+
+- I used GitHub Actions for the Continuous integration
+
+### Python CI
+
+- Workflow is described in [python_ci.yml](.github/workflows/python_ci.yml)
+- It runs python build:
+   - Download dependencies.
+   - Run linter.
+   - Run tests.
+- Then checks for vulnerabilities.
+- Finally, uploads Docker image to docker hub.
+
+### Kotlin CI
+
+- Workflow is described in [kotlin_ci.yml](.github/workflows/kotlin_ci.yml)
+- Firstly, we set up JDK 17.
+- Then run gradle build which includes tasks:
+   - Download dependencies.
+   - Run detekt linter.
+   - Run unit tests.
+- Then checks for vulnerabilities. Snyk might show warnings since there are
+  new vulnerabilities which can be fixed right now because there are no
+  library updates.
+- Finally, uploads Docker image to docker hub.
+
+## Contact
+
+- **Student:** Roman Soldatov
+- **Group:** B19-SD-01
+- **Email:** r.soldatov@innopolis.university
